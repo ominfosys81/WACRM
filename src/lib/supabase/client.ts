@@ -9,10 +9,18 @@ let browserClient: SupabaseClient | undefined
 export function createClient() {
   if (browserClient) return browserClient
 
-  browserClient = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  )
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+  if (!url || !key) {
+    // Fallback for Next.js build-time static generation when env vars are not yet injected
+    return createBrowserClient(
+      url || 'https://placeholder.supabase.co',
+      key || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.e30.placeholder'
+    )
+  }
+
+  browserClient = createBrowserClient(url, key)
 
   return browserClient
 }
