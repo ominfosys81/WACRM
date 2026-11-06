@@ -137,4 +137,12 @@ describe("middleware — every dashboard route requires a session", () => {
     expect(res.status).toBe(307);
     expect(new URL(res.headers.get("location")!).pathname).toBe("/login");
   });
+
+  it("handles missing environment variables gracefully without throwing", async () => {
+    delete process.env.NEXT_PUBLIC_SUPABASE_URL;
+    delete process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    const res = await middleware(new NextRequest("https://app.test/"));
+    expect(res.status).toBe(200);
+  });
 });
